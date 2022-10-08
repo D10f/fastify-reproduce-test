@@ -1,12 +1,30 @@
-import { test, expect } from 'vitest';
+import { describe, test, expect, afterAll } from 'vitest';
 import supertest from 'supertest';
-import { startServer } from './app';
+import { build } from './app';
 
-const server = startServer();
+let app = build();
 
-test('Should receive a Buffer', async () => {
-  const res = await supertest(server.server).get('/get-file').send();
-  expect(res.headers).toHaveProperty('content-type');
-  expect(res.headers['content-type']).toBe('application/octet-stream');
-  expect(res.body).toBeInstanceOf(Buffer);
+afterAll(() => app.close());
+
+describe('Tests with supertest on a running server', async () => {
+  await app.ready();
+
+  test('Should receive application/octet-stream', async () => {
+    const res = await supertest(app.server).get('/get-file');
+
+    expect(res.headers).toHaveProperty('content-type');
+    expect(res.headers['content-type']).toEqual('application/octet-stream');
+  });
+});
+
+describe('Tests with built-in inject', () => {
+  test('Should receive application/octet-stream', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/get-file',
+    });
+
+    expect(res.headers).toHaveProperty('content-type');
+    expect(res.headers['content-type']).toEqual('application/octet-stream');
+  });
 });

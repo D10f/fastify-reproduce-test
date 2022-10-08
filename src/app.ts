@@ -1,18 +1,14 @@
+import { resolve } from 'node:path';
+import { createReadStream } from 'node:fs';
 import Fastify from 'fastify';
-import route from './route';
 
-const app = Fastify({ logger: true });
+export function build(opts = {}) {
+  const app = Fastify(opts);
 
-app.register(route);
-
-export function startServer() {
-  app.listen({ port: 3000 }, (err, url) => {
-    if (err) {
-      app.log.error(err);
-      process.exit(1);
-    }
-
-    app.log.info(`Running and listening on ${url}`);
+  app.get('/get-file', (_request, reply) => {
+    const rs = createReadStream(resolve(__dirname, 'index.ts'));
+    reply.header('content-type', 'application/octet-stream');
+    reply.send(rs);
   });
 
   return app;

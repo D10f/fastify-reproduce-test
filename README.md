@@ -4,5 +4,6 @@ This repo reproduces the issue of [missing content-type header when replying wit
 
 1. Clone repo
 2. Run `npm install`.
-3. Run `npm test`. It should fail initially.
-4. In `route.ts`, uncomment line 8 to see the test succeed.
+3. Run `npm test`. Tests should succeed initially.
+4. In `app.ts`, comment out line 10 to see tests fail.
+5. Optional: delete `index.ts` to see tests fail. Related to "fastify" or "vitest"?
